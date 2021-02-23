@@ -1,0 +1,103 @@
+@primaryColor: #1890ff;
+@wrongColor  : #ff4d4f;
+@successColor: #52c41a;
+@blackColor  : #000000D9;
+@whiteColor  : #FFFFFF;
+@greyColor   : #d9d9d9;
+
+@largeFS  : 18 + 0px;
+@defaultFS: 14 + 0px;
+@smallFS  : 12 + 0px;
+
+// 字体大小
+.fs(@n) {
+  .fs-@{n} {
+    font-size: @n + 0px;
+  }
+}
+
+.createFs(@max) when (@max > 10) {
+  .createFs((@max - 2));
+  .fs(@max);
+}
+
+// 字体颜色
+.fc(@name, @color) {
+  .fc-@{name} {
+    color: @color;
+  }
+}
+
+// 字重
+.fw(@name, @weight) {
+  .fw-@{name} {
+    font-weight: @weight;
+  }
+}
+
+// 背景色
+.bg(@name, @color) {
+  .bg-@{name} {
+    background-color: @color;
+  }
+}
+
+// 边框色
+.border-c(@name, @color) {
+  .border-@{name} {
+    border-color: @color;
+  }
+}
+
+
+// 内边距
+.padding(@top, @right, @bottom, @left) {
+  .padding-@{top}-@{right}-@{bottom}-@{left} {
+    padding: @top + 0px @right + 0px @bottom + 0px @left + 0px;
+  }
+}
+
+// 单边内边距
+.padding-one(@n) {
+  .pt@{n} {
+    padding-top: @n + 0px;
+  }
+
+  .pb@{n} {
+    padding-bottom: @n + 0px;
+  }
+
+  .pl@{n} {
+    padding-left: @n + 0px;
+  }
+
+  .pr@{n} {
+    padding-right: @n + 0px;
+  }
+}
+
+// 外边距
+.margin(@top, @right, @bottom, @left) {
+  .margin-@{top}-@{right}-@{bottom}-@{left} {
+    margin: @top + 0px @right + 0px @bottom + 0px @left + 0px;
+  }
+}
+
+// 单边外边距
+.margin-one(@n) {
+  .mt@{n} {
+    margin-top: @n + 0px;
+  }
+
+  .mb@{n} {
+    margin-bottom: @n + 0px;
+  }
+
+  .ml@{n} {
+    margin-left: @n + 0px;
+  }
+
+  .mr@{n} {
+    margin-right: @n + 0px;
+  }
+}
