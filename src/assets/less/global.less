@@ -1,3 +1,10 @@
+.iconfont {
+  font-size: inherit;
+  display: inline;
+  vertical-align: middle
+}
+
+
 .bg(blue, @primaryColor);
 .bg(red, @wrongColor);
 .bg(green, @successColor);
@@ -7,6 +14,8 @@
 .fc(blue, @primaryColor);
 .fc(black, @blackColor);
 .fc(white, @whiteColor);
+.fc(grey, @greyColor);
+.fc(lightGrey, @lightGreyColor);
 
 .fs(12);
 .fs(14);
@@ -30,7 +39,7 @@
 
 
 .no-border {
-  border: 0;
+  border: none !important;
 }
 
 .ell {
@@ -39,19 +48,27 @@
   white-space  : nowrap;
 }
 
-.iconfont {
-  font-size: inherit;
-}
-
 .brl {
   border-left: 1px solid;
+  border-color: inherit;
 }
 .brr {
   border-right: 1px solid;
+  border-color: inherit;
 }
 .brt {
   border-top: 1px solid;
+  border-color: inherit;
 }
 .brb {
   border-bottom: 1px solid;
+  border-color: inherit;
+}
+
+.cus-point {
+  cursor: pointer;
+}
+.flex-v-b {
+  display: flex;
+  align-items: baseline;
 }

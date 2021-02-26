@@ -1,11 +1,8 @@
 <template>
-  <button :class="className" @click="onClick">
-    <slot name="default">
-      <span>{{ noContent || circle ? "" : "button" }}</span>
+  <button :class="className" @click="onClick" :style="custormStyle">
+    <slot name="default" v-if="!noContent">
+      <span>{{ circle ? "B" : "button" }}</span>
     </slot>
-    <span :class="{ ml5: !noContent && !circle }">
-      <slot name="icon"></slot>
-    </span>
   </button>
 </template>
 
@@ -43,8 +40,8 @@ const Button = defineComponent({
       type: Boolean,
       default: false,
     },
-    custormClass: {
-      type: String,
+    custormStyle: {
+      type: [String, Array, Object],
       default: "",
     },
     disabled: {
@@ -64,31 +61,24 @@ const Button = defineComponent({
     return {};
   },
   computed: {
-    className(): String {
+    className(): Object {
       let typeCls = ` button-${this.type.toLowerCase()}`;
-      let sizeCls =
-        this.size === "large"
-          ? " button-lg"
-          : this.size === "small"
-          ? " button-sm"
-          : "";
-      return (
-        "button" +
-        typeCls +
-        (this.ghost ? `${typeCls}-ghost` : "") +
-        (this.dash ? `${typeCls}-dash` : "") +
-        (this.disabled ? `${typeCls}-disabled` : "") +
-        (this.circle ? `${typeCls}-circle` : "") +
-        sizeCls +
-        " " +
-        this.custormClass
-      );
+      return {
+        button: true,
+        [typeCls]: true,
+        [`${typeCls}-ghost`]: this.ghost,
+        [`${typeCls}-dash`]: this.dash,
+        [`${typeCls}-disabled`]: this.disabled,
+        [`${typeCls}-circle`]: this.circle,
+        "button-lg": this.size === "large",
+        "button-sm": this.size === "small",
+      };
     },
   },
   methods: {
     onClick() {
-      this.$emit('click')
-    }
+      this.$emit("on-click");
+    },
   },
   mounted() {},
 });
