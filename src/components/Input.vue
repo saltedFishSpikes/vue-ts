@@ -67,18 +67,7 @@
   </div>
 </template>
 <script lang="ts">
-enum InputType {
-  TEXT = "text", // eslint-disable-line no-unused-vars
-  TEXTAREA = "textarea", // eslint-disable-line no-unused-vars
-  NUMBER = "number", // eslint-disable-line no-unused-vars
-  PASSWORD = "password", // eslint-disable-line no-unused-vars
-}
-enum SizeTypes {
-  LARGE = "large", // eslint-disable-line no-unused-vars
-  DEFAULT = "default", // eslint-disable-line no-unused-vars
-  SMALL = "small", // eslint-disable-line no-unused-vars
-}
-type Fun = <T>(v: T) => T;
+import { InputTypes, SizeTypes } from "@/common/init";
 import { defineComponent, PropType } from "vue"; // eslint-disable-line no-unused-vars
 const Input = defineComponent({
   props: {
@@ -91,8 +80,8 @@ const Input = defineComponent({
       default: "",
     },
     type: {
-      type: String as PropType<InputType>,
-      default: InputType.TEXT,
+      type: String as PropType<InputTypes>,
+      default: InputTypes.TEXT,
     },
     beforeCusStyle: {
       type: [String, Array, Object],
@@ -135,7 +124,7 @@ const Input = defineComponent({
       default: "",
     },
     inputFormat: {
-      type: Function as PropType<Fun>,
+      type: Function,
       default: (v: string | number) => v,
     },
     border: {
@@ -172,9 +161,9 @@ const Input = defineComponent({
     inputContentCls(): object {
       return {
         "input-main": true,
-        "input-lg": this.size === "large",
-        "input-sm": this.size === "small",
-        "flex-v-b": this.type !== "textarea",
+        "input-lg": this.size === SizeTypes.LARGE,
+        "input-sm": this.size === SizeTypes.SMALL,
+        "flex-v-b": this.type !== InputTypes.TEXTAREA,
         "disabled": this.disabled
       };
     },
@@ -183,8 +172,8 @@ const Input = defineComponent({
         let obj = {
           "addon-text": true,
           [bdr]: !!this.border,
-          "input-lg": this.size === "large",
-          "input-sm": this.size === "small",
+          "input-lg": this.size === SizeTypes.LARGE,
+          "input-sm": this.size === SizeTypes.SMALL,
         };
         return obj;
       };
@@ -218,11 +207,11 @@ const Input = defineComponent({
       this.inputValue = "";
       this.$emit("update:modelValue", this.inputValue);
     },
-    focus() {
-      this.getInput().focus();
+    focus():void {
+      this.getInput()?.focus();
     },
-    blur() {
-      this.getInput().blur();
+    blur():void {
+      this.getInput()?.blur();
     },
     getInput(): HTMLInputElement | HTMLTextAreaElement {
       return (

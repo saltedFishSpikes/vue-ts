@@ -1,26 +1,15 @@
 <template>
-  <button :class="className" @click="onClick" :style="custormStyle">
-    <slot name="default" v-if="!noContent">
-      <span>{{ circle ? "B" : "button" }}</span>
-    </slot>
+  <button :class="className" @click.stop="onClick" :style="custormStyle">
+    <template v-if="!noContent">
+      <slot name="default">
+        <span>{{ circle ? "B" : "button" }}</span>
+      </slot>
+    </template>
   </button>
 </template>
 
 <script lang="ts">
-// eslint-disable-line no-unused-vars
-enum ButtonTypes {
-  DEFAULT = "default", // eslint-disable-line no-unused-vars
-  PRIMARY = "primary", // eslint-disable-line no-unused-vars
-  TEXT = "text", // eslint-disable-line no-unused-vars
-  LINK = "link", // eslint-disable-line no-unused-vars
-}
-// eslint-disable-line no-unused-vars
-enum SizeTypes {
-  LARGE = "large", // eslint-disable-line no-unused-vars
-  DEFAULT = "default", // eslint-disable-line no-unused-vars
-  SMALL = "small", // eslint-disable-line no-unused-vars
-}
-
+import { ButtonTypes, SizeTypes } from "@/common/init";
 import { defineComponent, PropType } from "vue"; // eslint-disable-line no-unused-vars
 const Button = defineComponent({
   props: {
@@ -57,12 +46,9 @@ const Button = defineComponent({
       default: false,
     },
   },
-  data() {
-    return {};
-  },
   computed: {
     className(): Object {
-      let typeCls = ` button-${this.type.toLowerCase()}`;
+      let typeCls = `button-${this.type.toLowerCase()}`;
       return {
         button: true,
         [typeCls]: true,
@@ -70,17 +56,18 @@ const Button = defineComponent({
         [`${typeCls}-dash`]: this.dash,
         [`${typeCls}-disabled`]: this.disabled,
         [`${typeCls}-circle`]: this.circle,
-        "button-lg": this.size === "large",
-        "button-sm": this.size === "small",
+        "button-lg": this.size === SizeTypes.LARGE,
+        "button-sm": this.size === SizeTypes.SMALL,
       };
     },
   },
   methods: {
-    onClick() {
-      this.$emit("on-click");
+    onClick(): void {
+      if (!this.disabled) {
+        this.$emit("on-click");
+      }
     },
   },
-  mounted() {},
 });
 export default Button;
 </script>
@@ -91,6 +78,7 @@ export default Button;
   display: inline-block;
   cursor: pointer;
   white-space: nowrap;
+  height: 27px;
   text-align: center;
   font-size: @defaultFS;
   padding: 4px 17px;
@@ -99,17 +87,21 @@ export default Button;
   background-color: @whiteColor;
   border: 1px solid @greyColor;
   &-lg {
+    height: 35px;
     padding: 6px 20px;
     font-size: @largeFS;
   }
   &-sm {
+    height: 20px;
     padding: 2px 10px;
     font-size: @smallFS;
   }
   &-default {
-    &-disable {
+    &-disabled {
       cursor: not-allowed;
       opacity: 0.6;
+      background-color: @lightGreyColor;
+      border-color: @greyColor;
     }
     &-ghost {
       background-color: transparent;
@@ -136,7 +128,7 @@ export default Button;
       opacity: 0.6;
       transition: opacity 0.1s ease;
     }
-    &-disable {
+    &-disabled {
       cursor: not-allowed;
       opacity: 0.6;
     }
@@ -164,7 +156,7 @@ export default Button;
       opacity: 0.6;
       transition: opacity 0.1s ease;
     }
-    &-disable {
+    &-disabled {
       cursor: not-allowed;
       color: @greyColor;
     }
@@ -178,7 +170,7 @@ export default Button;
       opacity: 0.6;
       transition: opacity 0.1s ease;
     }
-    &-disable {
+    &-disabled {
       cursor: not-allowed;
       color: @greyColor;
     }
