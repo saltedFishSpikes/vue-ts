@@ -1,5 +1,5 @@
 <template>
-  <button :class="className" @click.stop="onClick" :style="custormStyle">
+  <button :class="className" @click.stop="onClick">
     <template v-if="!noContent">
       <slot name="default">
         <span>{{ circle ? "B" : "button" }}</span>
@@ -11,6 +11,7 @@
 <script lang="ts">
 import { ButtonTypes, SizeTypes } from "@/common/init";
 import { defineComponent, PropType } from "vue"; // eslint-disable-line no-unused-vars
+import { mergeClass } from '@/common/util'
 const Button = defineComponent({
   props: {
     type: {
@@ -29,7 +30,7 @@ const Button = defineComponent({
       type: Boolean,
       default: false,
     },
-    custormStyle: {
+    custormClass: {
       type: [String, Array, Object],
       default: "",
     },
@@ -49,7 +50,7 @@ const Button = defineComponent({
   computed: {
     className(): Object {
       let typeCls = `button-${this.type.toLowerCase()}`;
-      return {
+      let cls =  {
         button: true,
         [typeCls]: true,
         [`${typeCls}-ghost`]: this.ghost,
@@ -59,6 +60,7 @@ const Button = defineComponent({
         "button-lg": this.size === SizeTypes.LARGE,
         "button-sm": this.size === SizeTypes.SMALL,
       };
+      return mergeClass(cls, this.custormClass)
     },
   },
   methods: {

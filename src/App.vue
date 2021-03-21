@@ -39,7 +39,9 @@
       v-model="v"
       type="button"
     ></m-radio-group>
-    <m-rate></m-rate>
+    {{kl}}
+    <m-rate v-model="kl" half>皮</m-rate>
+    <m-table></m-table>
   </div>
 </template>
 
@@ -50,13 +52,15 @@ import Input from "./components/Input.vue";
 import Radio from "./components/Radio.vue";
 import RadioGroup from "./components/RadioGroup.vue";
 import Rate from "./components/Rate.vue";
+import Table from "./components/Table.vue";
 @Options({
   components: {
     "m-button": Button,
     "m-input": Input,
     "m-radio": Radio,
     "m-radio-group": RadioGroup,
-    "m-rate": Rate
+    "m-rate": Rate,
+    "m-table": Table
   },
   data() {
     return {
@@ -67,7 +71,8 @@ import Rate from "./components/Rate.vue";
         { id: 2, value: 2 },
         { id: 3, value: 3, label: "d" },
       ],
-      v: 1
+      v: 1,
+      kl: 1
     };
   },
   mounted() {
@@ -96,7 +101,7 @@ import Rate from "./components/Rate.vue";
 export default class App extends Vue {}
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .asd {
   margin: 10px;
   // background-color: red

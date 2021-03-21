@@ -21,3 +21,9 @@ export enum RadioTypes {
   DEFAULT = 'default',
   BUTTON = 'button'
 }
+export enum AlignTypes {
+  LEFT = 'left',
+  RIGHT = 'right',
+  CENTER = 'center'
+}
+export type ClassType = Array<string> | string | object
