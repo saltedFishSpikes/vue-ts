@@ -39,3 +39,19 @@ export const mergeClass = (currCls: ClassType, otherCls: ClassType): object => {
   }
   return res
 }
+// scroll宽度
+let scrollWidth: null|number = null
+export const getScrollWidth = () => {
+  if (scrollWidth || scrollWidth === 0) return scrollWidth
+  let noScrollWidth = document.documentElement.clientWidth
+  const body: HTMLBodyElement = document.getElementsByTagName('body')[0]
+  let div = document.createElement('div')
+  div.style.height = '10000px'
+  div.style.overflow = 'scroll'
+  div.style.opacity = '0'
+  body.appendChild(div)
+  let hasScrollWidth = document.documentElement.clientWidth
+  body.removeChild(div)
+  scrollWidth = noScrollWidth - hasScrollWidth
+  return scrollWidth
+}

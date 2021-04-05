@@ -1,8 +1,6 @@
 <template>
   <div class="asd">
-    <m-button type="primary"  disabled @on-click="fdsf">
-      {{}}
-    </m-button>
+    <m-button type="primary" disabled @on-click="fdsf"> {{}} </m-button>
     <m-input
       type="text"
       ref="m-input"
@@ -29,7 +27,6 @@
       :value="item.value"
       @on-choose="change"
       :checked="v === item.value"
-      
     >
       hjkfkjdhglsjgdj
     </m-radio>
@@ -39,9 +36,16 @@
       v-model="v"
       type="button"
     ></m-radio-group>
-    {{kl}}
+    {{ kl }}
     <m-rate v-model="kl" half>皮</m-rate>
-    <m-table></m-table>
+    <m-table
+      width="400px"
+      height="400px"
+      :tableColumn="tableColumn"
+      :tableData="tableData"
+      headerFix
+    ></m-table>
+    hjk
   </div>
 </template>
 
@@ -53,6 +57,7 @@ import Radio from "./components/Radio.vue";
 import RadioGroup from "./components/RadioGroup.vue";
 import Rate from "./components/Rate.vue";
 import Table from "./components/Table.vue";
+import { getScrollWidth } from "@/common/util";
 @Options({
   components: {
     "m-button": Button,
@@ -60,7 +65,7 @@ import Table from "./components/Table.vue";
     "m-radio": Radio,
     "m-radio-group": RadioGroup,
     "m-rate": Rate,
-    "m-table": Table
+    "m-table": Table,
   },
   data() {
     return {
@@ -72,8 +77,42 @@ import Table from "./components/Table.vue";
         { id: 3, value: 3, label: "d" },
       ],
       v: 1,
-      kl: 1
+      kl: 1,
+      tableColumn: [
+        {
+          key: "name",
+          title: "姓名",
+          align: "center",
+          width: 100,
+          fixed: "left",
+        },
+        {
+          key: "age",
+          width: 240,
+          title: "年龄",
+          fixed: "right",
+        },
+        {
+          key: "gender",
+          title: "性别",
+          width: 120,
+        },
+      ],
+      tableData: [
+        { age: 12, name: "小红", gender: 12 },
+        { age: 12, name: "小红", gender: 13 },
+        { age: 12, name: "小红", gender: 14 },
+        { age: 12, name: "小红", gender: 1 },
+        { age: 12, name: "小红", gender: 1 },
+        { age: 12, name: "小红", gender: 1 },
+        { age: 12, name: "小红", gender: 1 },
+        { age: 12, name: "小红", gender: 1 },
+        { age: 12, name: "小红", gender: 1 },
+      ]
     };
+  },
+  created() {
+    getScrollWidth();
   },
   mounted() {
     this.$refs["m-input"].focus();

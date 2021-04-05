@@ -26,4 +26,8 @@ export enum AlignTypes {
   RIGHT = 'right',
   CENTER = 'center'
 }
+export enum tableCellType {
+  BODY = 'body',
+  HEADER = 'header'
+}
 export type ClassType = Array<string> | string | object

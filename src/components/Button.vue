@@ -88,6 +88,7 @@ export default Button;
   border-radius: 4px;
   background-color: @whiteColor;
   border: 1px solid @greyColor;
+  line-height: 1;
   &-lg {
     height: 35px;
     padding: 6px 20px;
