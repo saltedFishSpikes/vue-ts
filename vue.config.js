@@ -1,4 +1,5 @@
 const path = require('path');
+const openInEditor = require('launch-editor-middleware')
 function resolve(dir) {
   return path.join(__dirname, dir);
 }
@@ -25,4 +26,9 @@ module.exports = {
       ],
     },
   },
+  devServer: {
+    before(app) {
+      app.use('/__open-in-editor', openInEditor())
+    }
+  }
 }

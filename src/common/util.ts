@@ -1,4 +1,4 @@
-import { ClassType } from './init'
+import { ClassType, AnyObjType } from './init'
 export const setObjectAttr = (obj: object, key: number | string, value: any) => {
   Object.defineProperties(obj, {
     [key]: {
@@ -40,7 +40,7 @@ export const mergeClass = (currCls: ClassType, otherCls: ClassType): object => {
   return res
 }
 // scroll宽度
-let scrollWidth: null|number = null
+let scrollWidth: null | number = null
 export const getScrollWidth = () => {
   if (scrollWidth || scrollWidth === 0) return scrollWidth
   let noScrollWidth = document.documentElement.clientWidth
@@ -54,4 +54,35 @@ export const getScrollWidth = () => {
   body.removeChild(div)
   scrollWidth = noScrollWidth - hasScrollWidth
   return scrollWidth
+}
+export const getDeep = <T extends AnyObjType>(arr: Array<T>, childKey: string = 'children'): number => {
+  const res = arr.map(obj => {
+    if (Object.hasOwnProperty.call(obj, childKey) && Array.isArray(obj[childKey])) {
+      return getDeep(obj[childKey], childKey) + 1
+    }
+    return 1
+  })
+  return Math.max(...res)
+}
+export const arrayFlat = <T extends AnyObjType>(arr: Array<T>, childKey: string = 'children', deep: number = Infinity): Array<T> => {
+  let res: Array<T> = []
+  if (deep > 1) {
+    arr.forEach(obj => {
+      if (Object.hasOwnProperty.call(obj, childKey) && Array.isArray(obj[childKey])) {
+        res = res.concat(arrayFlat(obj[childKey], childKey, deep - 1))
+      } else {
+        res = res.concat([obj])
+      }
+    })
+    return res
+  } else {
+    return arr
+  }
+}
+export const getItemsByDeep = <T extends AnyObjType>(arr: Array<T>, childKey: string = 'children', deep: number = Infinity): Array<T> => {
+  while (deep > 1 && arr.length) {
+    arr = arr.map(obj => obj[childKey]).filter(obj => !!obj).flat(Infinity)
+    deep--
+  }
+  return arr
 }

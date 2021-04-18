@@ -26,8 +26,11 @@ export enum AlignTypes {
   RIGHT = 'right',
   CENTER = 'center'
 }
-export enum tableCellType {
+export enum TableCellType {
   BODY = 'body',
   HEADER = 'header'
 }
 export type ClassType = Array<string> | string | object
+export interface AnyObjType {
+  [key: string]:  any
+}

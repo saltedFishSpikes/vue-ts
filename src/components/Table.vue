@@ -7,7 +7,7 @@
         width: `${rightTopCorner.width}px`,
       }"
       class="right-top-corner"
-      :class="cellClass(0, 0, 'body')"
+      :class="cellClass(0, '', 'body')"
       v-if="rightTopCorner.height && rightTopCorner.width"
     ></div>
     <!-- 固定表头 -->
@@ -21,7 +21,7 @@
       <div
         v-for="{ type, column } of tableFilterFixed"
         :key="type"
-        :class="fixClass(type)"
+        :class="fixedClass(type)"
         :style="{
           maxWidth: type === 'center' ? width : 'unset',
           left: type === 'left' ? leftFixed + 'px' : 'unset',
@@ -30,21 +30,23 @@
         :ref="`header-${type}`"
       >
         <table :class="contentClass()" cellspacing="0" cellpadding="0">
-          <colgroup>
-            <col
-              v-for="h of column"
-              :key="h.key"
-              :width="getCellWidth(h.width)"
-            />
-          </colgroup>
           <thead>
-            <tr>
+            <tr v-for="i of type === 'center' ? headerDeep : 1" :key="i">
               <th
-                v-for="(h, index) of column"
+                v-for="h of getItemsByDeep(column, 'children', i)"
                 :key="h.key"
-                :class="cellClass(0, index, 'header')"
+                :rowspan="(type !== 'center' || h.children) ? 1 : headerDeep - i + 1"
+                :colspan="
+                  h.children ? arrayFlat(h.children, 'children').length : 1
+                "
+                :class="cellClass(0, h.key, 'header')"
               >
-                <div :style="{ width: `${getCellWidth(h.width)}px` }">
+                <div
+                  :style="{
+                    width: !h.children ? `${getCellWidth(h.width)}px` : 'unset',
+                    height: type !== 'center' ? `${rightTopCorner.height}px` : 'unset',
+                  }"
+                >
                   {{ h.title }}
                 </div>
               </th>
@@ -63,39 +65,41 @@
       <div
         v-for="{ type, column } of tableFilterFixed"
         :key="type"
-        :class="fixClass(type)"
+        :class="fixedClass(type)"
         :style="{
           left: type === 'left' ? leftFixed + 'px' : 'unset',
           right: type === 'right' ? rightFixed + 'px' : 'unset',
         }"
       >
         <table :class="contentClass()" cellspacing="0" cellpadding="0">
-          <colgroup>
-            <col
-              v-for="h of column"
-              :key="h.key"
-              :width="getCellWidth(h.width)"
-            />
-          </colgroup>
-          <thead v-if="!headerFix">
-            <tr>
+          <thead v-if="!headerFix" :ref="`header-${type}`">
+            <tr v-for="i of headerDeep" :key="i">
+              <!-- 
+                单独获取那一层tr的th（嵌套第n层的子元素）
+                th有子元素，纵向占一格，横向占最底层子元素个数的格子
+                没有子元素，纵向占剩余的层数，横向占一格
+               -->
               <th
-                v-for="(h, index) of column"
+                v-for="h of getItemsByDeep(column, 'children', i)"
                 :key="h.key"
-                :class="cellClass(0, index, 'body')"
+                :rowspan="(type !== 'center' || h.children) ? 1 : headerDeep - i + 1"
+                :colspan="
+                  h.children ? arrayFlat(h.children, 'children').length : 1
+                "
+                :class="cellClass(0, h.key, 'header')"
               >
-                <div :style="{ width: `${getCellWidth(h.width)}px` }">
-                  {{ h.title }}
-                </div>
+                <div
+                  :style="{ height: type !== 'center' ? `${rightTopCorner.height}px` : 'unset'}"
+                >{{ h.title }}</div>
               </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(b, index) of tableData" :key="index">
               <td
-                v-for="(col, i) of column"
+                v-for="col of arrayFlat(column, 'children', headerDeep)"
                 :key="col.key"
-                :class="cellClass(index, i, 'body')"
+                :class="cellClass(index, col.key, 'body')"
               >
                 <div :style="{ width: `${getCellWidth(col.width)}px` }">
                   {{ b[col.key] }}
@@ -110,19 +114,21 @@
 </template>
 <script lang="ts">
 // 注：若每列设置宽度，表格总宽度width大于每列之和，样式会出现问题
-import { AlignTypes, tableCellType } from "@/common/init"; // eslint-disable-line no-unused-vars
+import { AlignTypes, TableCellType } from "@/common/init"; // eslint-disable-line no-unused-vars
 import { defineComponent, PropType } from "vue"; // eslint-disable-line no-unused-vars
-import { mergeClass, getScrollWidth } from "@/common/util";
+import { mergeClass, getDeep, arrayFlat, getItemsByDeep } from "@/common/util";
 interface TableColumnType {
   key: string;
   title: string;
   align?: AlignTypes;
   width?: number;
   fixed?: AlignTypes;
+  children?: Array<TableColumnType>;
 }
 interface filterColumn {
   type: string;
   column: Array<TableColumnType>;
+  columnFlated: Array<TableColumnType>;
 }
 let prevLeft: number = 0;
 let prevRight: number = 0;
@@ -138,7 +144,7 @@ const Table = defineComponent({
     },
     border: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     // 斑马纹
     stripe: {
@@ -162,24 +168,35 @@ const Table = defineComponent({
     return {
       scrollWidth: 0,
       rightTopCorner: { width: 0, height: 0 },
-      columnDefaultWidth: 0,
+      columnDefaultWidth: 100,
       leftFixed: 0,
       rightFixed: 0,
+      getItemsByDeep,
+      arrayFlat,
     };
   },
   computed: {
     tableClass(): object {
       return {
         table: true,
-        br: this.border,
+        brt: this.border,
+        brr: this.border,
+        brb: this.border,
       };
+    },
+    currentColumn(): Array<TableColumnType> {
+      return arrayFlat(this.tableColumn, "children", this.headerDeep);
     },
     tableFilterFixed(): Array<filterColumn> {
       const left = this.tableColumn.filter(
-        (item) => item.fixed === AlignTypes.LEFT
+        (item) =>
+          item.fixed === AlignTypes.LEFT &&
+          !Object.prototype.hasOwnProperty.call(item, "children")
       );
       const right = this.tableColumn.filter(
-        (item) => item.fixed === AlignTypes.RIGHT
+        (item) =>
+          item.fixed === AlignTypes.RIGHT &&
+          !Object.prototype.hasOwnProperty.call(item, "children")
       );
       let res = [];
       const center = [...this.tableColumn].sort((a, b) => {
@@ -192,42 +209,70 @@ const Table = defineComponent({
         const bI = b.fixed ? idx[b.fixed || AlignTypes.CENTER] : 1;
         return aI - bI;
       });
-      if (left.length) res.push({ type: AlignTypes.LEFT, column: left });
-      if (this.tableColumn.length)
-        res.push({ type: AlignTypes.CENTER, column: center });
-      if (right.length) res.push({ type: AlignTypes.RIGHT, column: right });
+      if (left.length)
+        res.push({
+          type: AlignTypes.LEFT,
+          column: left,
+          columnFlated: arrayFlat(left, "children", this.headerDeep),
+        });
+      if (this.currentColumn.length)
+        res.push({
+          type: AlignTypes.CENTER,
+          column: center,
+          columnFlated: arrayFlat(center, "children", this.headerDeep),
+        });
+      if (right.length)
+        res.push({
+          type: AlignTypes.RIGHT,
+          column: right,
+          columnFlated: arrayFlat(right, "children", this.headerDeep),
+        });
       return res;
     },
-  },
-  created() {
-    this.scrollWidth = getScrollWidth();
+    headerDeep(): number {
+      return getDeep(this.tableColumn, "children");
+    },
   },
   mounted() {
     this.$nextTick(() => {
       this.resetDOMInfo();
-    });
+    })
     window.addEventListener("resize", this.resetDOMInfo);
+  },
+  watch: {
+    "tableData.length"() {
+      this.resetDOMInfo();
+    },
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.resetDOMInfo);
   },
   methods: {
-    cellClass(rowIndex: number, colIndex: number, type: tableCellType): object {
+    cellClass(rowIndex: number, colKey: string, type: TableCellType): object {
+      let colIndex: number = this.currentColumn.findIndex(
+        (col) => col.key === colKey
+      );
+      if (colIndex === -1) colIndex = 0;
       const initClass = mergeClass(
         this.colClass(colIndex),
         this.rowClass(rowIndex)
       );
       return mergeClass(initClass, {
-        brl: this.border && colIndex !== 0,
+        brl: this.border,
         brb:
-          rowIndex !== this.tableData.length - 1 &&
-          tableCellType.HEADER !== type,
+          (rowIndex !== this.tableData.length - 1 &&
+            TableCellType.HEADER !== type) ||
+          !(
+            TableCellType.HEADER === type &&
+            this.headerDeep > 1 &&
+            !this.border
+          ),
       });
     },
     colClass(colIndex: number): object {
-      const column: TableColumnType = this.tableColumn[colIndex];
+      const column: TableColumnType = this.currentColumn[colIndex];
       return {
-        [`f-${column.align || "left"}`]: true,
+        [`flex-jc-${column.align || "left"}`]: true,
       };
     },
     rowClass(rowIndex: number): object {
@@ -240,33 +285,12 @@ const Table = defineComponent({
         "table-content": true,
       };
     },
-    fixClass(type: string): object {
+    fixedClass(type: string): object {
       return {
         "table-fixed": type !== AlignTypes.CENTER,
         "table-fixed_left": type === AlignTypes.LEFT,
         "table-fixed_right": type === AlignTypes.RIGHT,
       };
-    },
-    getColumnDefaultWidth(): void {
-      const table = this.$refs.table as HTMLDivElement;
-      if (!table) {
-        this.columnDefaultWidth = 0;
-        return;
-      }
-      let wholeWidth: number = table.scrollWidth - this.rightTopCorner.width;
-      let count: number = 0;
-      this.tableColumn.forEach((col) => {
-        if (typeof col.width === "number") {
-          wholeWidth -= col.width;
-        } else {
-          count++;
-        }
-      });
-      if (count === 0) {
-        this.columnDefaultWidth = 0;
-      } else {
-        this.columnDefaultWidth = wholeWidth / count;
-      }
     },
     getCellWidth(width: number | undefined): number {
       if (width === undefined) width = this.columnDefaultWidth;
@@ -276,13 +300,6 @@ const Table = defineComponent({
       return width;
     },
     getRightTopCorner(): void {
-      if (!this.headerFix) {
-        this.rightTopCorner = {
-          width: 0,
-          height: 0,
-        };
-        return;
-      }
       let res = {
         width: 0,
         height: 0,
@@ -292,7 +309,10 @@ const Table = defineComponent({
         res.width = clientWidth !== offsetWidth ? this.scrollWidth : 0;
       }
       if (this.$refs.header) {
-        const { offsetHeight } = this.$refs.header as HTMLDivElement;
+        const { offsetHeight } = this.$refs.header as HTMLHtmlElement;
+        res.height = offsetHeight;
+      } else if (this.$refs['header-center']) {
+        const { offsetHeight } = this.$refs['header-center'] as HTMLHtmlElement;
         res.height = offsetHeight;
       }
       this.rightTopCorner = res;
@@ -300,8 +320,8 @@ const Table = defineComponent({
     tableXScroll(needToScroll: string, e: Event) {
       if (!e.target) return;
       const { scrollLeft } = e.target as HTMLElement;
-      const left = Number(scrollLeft.toFixed(2));
-      const right = -Number(scrollLeft.toFixed(2));
+      const left = Number(scrollLeft);
+      const right = -Number(scrollLeft);
       // 当前操作的另一部分，需要处理非表头固定
       if (this.$refs[needToScroll])
         (this.$refs[needToScroll] as HTMLElement).scrollLeft = left;
@@ -317,8 +337,15 @@ const Table = defineComponent({
       }
     },
     resetDOMInfo() {
-      this.getRightTopCorner();
-      this.getColumnDefaultWidth();
+      this.getNewScrollWidth();
+      this.$nextTick(() => {
+        this.getRightTopCorner();
+      })
+    },
+    getNewScrollWidth() {
+      const table = this.$refs.body as HTMLDivElement;
+      if (!table) return;
+      this.scrollWidth = table.offsetWidth - table.clientWidth;
     },
   },
 });
@@ -357,7 +384,8 @@ export default Table;
     border-color: inherit;
     z-index: 2;
     position: relative;
-    overflow-y: auto;
+    overflow-y: hidden;
+    background-color: @lightGreyColor;
     &::-webkit-scrollbar {
       display: none;
     }
@@ -370,7 +398,6 @@ export default Table;
   }
   &-content {
     border-color: @greyColor;
-    table-layout: auto;
     word-break: break-all;
     word-wrap: break-word;
     box-sizing: border-box;
@@ -384,6 +411,9 @@ export default Table;
           div {
             padding: 16px;
             font-weight: bold;
+            display: flex;
+            justify-content: inherit;
+            align-items: center;
           }
         }
       }

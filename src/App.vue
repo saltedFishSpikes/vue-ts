@@ -36,14 +36,12 @@
       v-model="v"
       type="button"
     ></m-radio-group>
-    {{ kl }}
     <m-rate v-model="kl" half>皮</m-rate>
     <m-table
-      width="400px"
       height="400px"
       :tableColumn="tableColumn"
       :tableData="tableData"
-      headerFix
+      border
     ></m-table>
     hjk
   </div>
@@ -81,34 +79,107 @@ import { getScrollWidth } from "@/common/util";
       tableColumn: [
         {
           key: "name",
-          title: "姓名",
-          align: "center",
-          width: 100,
-          fixed: "left",
-        },
-        {
-          key: "age",
-          width: 240,
-          title: "年龄",
-          fixed: "right",
+          title: "1",
+          children: [
+            {
+              key: "name",
+              title: "1-1",
+              align: "center",
+              width: 100,
+            },
+            {
+              key: "age",
+              title: "1-2",
+              align: "center",
+              width: 100,
+            },
+          ],
         },
         {
           key: "gender",
-          title: "性别",
+          width: 240,
+          title: "2",
+          fixed: 'right'
+        },
+        {
+          key: "5+6",
+          title: "3",
           width: 120,
+          children: [
+            {
+              key: "name",
+              title: "3-1",
+              align: "center",
+              children: [
+                {
+                  key: "name",
+                  title: "3-1-1",
+                  align: "center",
+                  width: 100,
+                },
+                {
+                  key: "age",
+                  title: "3-1-2",
+                  align: "center",
+                },
+              ],
+            },
+            {
+              key: "age",
+              title: "3-2",
+              align: "center",
+              children: [
+                {
+                  key: "name",
+                  title: "3-2-1",
+                  align: "center",
+                },
+                {
+                  key: "age",
+                  title: "3-2-2",
+                  align: "center",
+                  children: [
+                    {
+                      key: "name",
+                      title: "3-2-2-1",
+                      align: "center",
+                    },
+                    {
+                      key: "age",
+                      title: "3-2-2-2",
+                      align: "center",
+                      width: 100,
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+                  key: "age",
+                  title: "3-3",
+                  align: "center",
+                  width: 100,
+                },
+                {
+                  key: "age",
+                  title: "3-4",
+                  align: "center",
+                  width: 100,
+                },
+          ],
         },
       ],
       tableData: [
-        { age: 12, name: "小红", gender: 12 },
-        { age: 12, name: "小红", gender: 13 },
-        { age: 12, name: "小红", gender: 14 },
-        { age: 12, name: "小红", gender: 1 },
-        { age: 12, name: "小红", gender: 1 },
-        { age: 12, name: "小红", gender: 1 },
-        { age: 12, name: "小红", gender: 1 },
-        { age: 12, name: "小红", gender: 1 },
-        { age: 12, name: "小红", gender: 1 },
-      ]
+        { age: 1231232, name: "小红", gender: '男' },
+        { age: 12, name: "小红", gender: '男' },
+        { age: 12, name: "小红", gender: '男' },
+        { age: 12, name: "小红", gender: '男' },
+        { age: 12, name: "小红", gender: '男' },
+        { age: 12, name: "小红", gender: '男' },
+        { age: 12, name: "小红", gender: '男' },
+        { age: 12, name: "小红", gender: '男' },
+        { age: 12, name: "小红", gender: '男' },
+      ],
     };
   },
   created() {
