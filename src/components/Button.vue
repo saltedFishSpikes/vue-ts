@@ -11,7 +11,7 @@
 <script lang="ts">
 import { ButtonTypes, SizeTypes } from "@/common/init";
 import { defineComponent, PropType } from "vue"; // eslint-disable-line no-unused-vars
-import { mergeClass } from '@/common/util'
+import { mergeClass } from "@/common/util";
 const Button = defineComponent({
   props: {
     type: {
@@ -47,10 +47,11 @@ const Button = defineComponent({
       default: false,
     },
   },
+  emits: ["on-click"],
   computed: {
     className(): Object {
       let typeCls = `button-${this.type.toLowerCase()}`;
-      let cls =  {
+      let cls = {
         button: true,
         [typeCls]: true,
         [`${typeCls}-ghost`]: this.ghost,
@@ -60,7 +61,7 @@ const Button = defineComponent({
         "button-lg": this.size === SizeTypes.LARGE,
         "button-sm": this.size === SizeTypes.SMALL,
       };
-      return mergeClass(cls, this.custormClass)
+      return mergeClass(cls, this.custormClass);
     },
   },
   methods: {

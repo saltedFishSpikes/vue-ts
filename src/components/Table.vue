@@ -35,7 +35,9 @@
               <th
                 v-for="h of getItemsByDeep(column, 'children', i)"
                 :key="h.key"
-                :rowspan="(type !== 'center' || h.children) ? 1 : headerDeep - i + 1"
+                :rowspan="
+                  type !== 'center' || h.children ? 1 : headerDeep - i + 1
+                "
                 :colspan="
                   h.children ? arrayFlat(h.children, 'children').length : 1
                 "
@@ -44,10 +46,17 @@
                 <div
                   :style="{
                     width: !h.children ? `${getCellWidth(h.width)}px` : 'unset',
-                    height: type !== 'center' ? `${rightTopCorner.height}px` : 'unset',
+                    height:
+                      type !== 'center'
+                        ? `${rightTopCorner.height}px`
+                        : 'unset',
                   }"
                 >
-                  {{ h.title }}
+                  <m-render
+                    v-if="h.headerRender"
+                    :renderFun="h.headerRender.bind(this, h)"
+                  ></m-render>
+                  <span v-else>{{ h.title }}</span>
                 </div>
               </th>
             </tr>
@@ -82,27 +91,49 @@
               <th
                 v-for="h of getItemsByDeep(column, 'children', i)"
                 :key="h.key"
-                :rowspan="(type !== 'center' || h.children) ? 1 : headerDeep - i + 1"
+                :rowspan="
+                  type !== 'center' || h.children ? 1 : headerDeep - i + 1
+                "
                 :colspan="
                   h.children ? arrayFlat(h.children, 'children').length : 1
                 "
                 :class="cellClass(0, h.key, 'header')"
               >
                 <div
-                  :style="{ height: type !== 'center' ? `${rightTopCorner.height}px` : 'unset'}"
-                >{{ h.title }}</div>
+                  :style="{
+                    height:
+                      type !== 'center'
+                        ? `${rightTopCorner.height}px`
+                        : 'unset',
+                  }"
+                >
+                  <m-render
+                    v-if="h.headerRender"
+                    :renderFun="h.headerRender.bind(this, h)"
+                  ></m-render>
+                  <span v-else>{{ h.title }}</span>
+                </div>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(b, index) of tableData" :key="index">
+            <tr
+              v-for="(b, index) of tableData"
+              :key="index"
+              @click="$emit('on-row-click', b, index)"
+            >
               <td
                 v-for="col of arrayFlat(column, 'children', headerDeep)"
                 :key="col.key"
                 :class="cellClass(index, col.key, 'body')"
+                @click="$emit('on-cell-click', b[col.key], index)"
               >
                 <div :style="{ width: `${getCellWidth(col.width)}px` }">
-                  {{ b[col.key] }}
+                  <m-render
+                    v-if="col.bodyRender"
+                    :renderFun="col.bodyRender.bind(this, b[col.key])"
+                  ></m-render>
+                  <span v-else>{{ b[col.key] }}</span>
                 </div>
               </td>
             </tr>
@@ -115,8 +146,10 @@
 <script lang="ts">
 // 注：若每列设置宽度，表格总宽度width大于每列之和，样式会出现问题
 import { AlignTypes, TableCellType } from "@/common/init"; // eslint-disable-line no-unused-vars
-import { defineComponent, PropType } from "vue"; // eslint-disable-line no-unused-vars
+import { defineComponent, PropType, VNode, nextTick } from "vue"; // eslint-disable-line no-unused-vars
 import { mergeClass, getDeep, arrayFlat, getItemsByDeep } from "@/common/util";
+import Render from "./Render.vue";
+type renderFun = (data: any, h: Function) => VNode;
 interface TableColumnType {
   key: string;
   title: string;
@@ -124,8 +157,10 @@ interface TableColumnType {
   width?: number;
   fixed?: AlignTypes;
   children?: Array<TableColumnType>;
+  headerRender?: renderFun;
+  bodyRender?: renderFun;
 }
-interface filterColumn {
+interface FilterColumn {
   type: string;
   column: Array<TableColumnType>;
   columnFlated: Array<TableColumnType>;
@@ -164,6 +199,9 @@ const Table = defineComponent({
       default: "",
     },
   },
+  components: {
+    "m-render": Render,
+  },
   data() {
     return {
       scrollWidth: 0,
@@ -187,26 +225,30 @@ const Table = defineComponent({
     currentColumn(): Array<TableColumnType> {
       return arrayFlat(this.tableColumn, "children", this.headerDeep);
     },
-    tableFilterFixed(): Array<filterColumn> {
+    tableFilterFixed(): Array<FilterColumn> {
       const left = this.tableColumn.filter(
-        (item) =>
+        (item: TableColumnType) =>
           item.fixed === AlignTypes.LEFT &&
           !Object.prototype.hasOwnProperty.call(item, "children")
       );
       const right = this.tableColumn.filter(
-        (item) =>
+        (item: TableColumnType) =>
           item.fixed === AlignTypes.RIGHT &&
           !Object.prototype.hasOwnProperty.call(item, "children")
       );
-      let res = [];
+      let res: Array<FilterColumn> = [];
       const center = [...this.tableColumn].sort((a, b) => {
         const idx = {
-          [AlignTypes.LEFT]: 0,
-          [AlignTypes.CENTER]: 1,
-          [AlignTypes.RIGHT]: 2,
+          left: 0,
+          center: 1,
+          right: 2,
         };
-        const aI = a.fixed ? idx[a.fixed || AlignTypes.CENTER] : 1;
-        const bI = b.fixed ? idx[b.fixed || AlignTypes.CENTER] : 1;
+        const aI = a.fixed
+          ? idx[(a.fixed as AlignTypes) || AlignTypes.CENTER]
+          : 1;
+        const bI = b.fixed
+          ? idx[(b.fixed as AlignTypes) || AlignTypes.CENTER]
+          : 1;
         return aI - bI;
       });
       if (left.length)
@@ -233,10 +275,11 @@ const Table = defineComponent({
       return getDeep(this.tableColumn, "children");
     },
   },
+  emits: ["on-cell-click", "on-row-click"],
   mounted() {
-    this.$nextTick(() => {
+    nextTick(() => {
       this.resetDOMInfo();
-    })
+    });
     window.addEventListener("resize", this.resetDOMInfo);
   },
   watch: {
@@ -250,7 +293,7 @@ const Table = defineComponent({
   methods: {
     cellClass(rowIndex: number, colKey: string, type: TableCellType): object {
       let colIndex: number = this.currentColumn.findIndex(
-        (col) => col.key === colKey
+        (col: TableColumnType) => col.key === colKey
       );
       if (colIndex === -1) colIndex = 0;
       const initClass = mergeClass(
@@ -262,11 +305,7 @@ const Table = defineComponent({
         brb:
           (rowIndex !== this.tableData.length - 1 &&
             TableCellType.HEADER !== type) ||
-          !(
-            TableCellType.HEADER === type &&
-            this.headerDeep > 1 &&
-            !this.border
-          ),
+          (TableCellType.HEADER === type && this.border),
       });
     },
     colClass(colIndex: number): object {
@@ -295,9 +334,9 @@ const Table = defineComponent({
     getCellWidth(width: number | undefined): number {
       if (width === undefined) width = this.columnDefaultWidth;
       if (this.border) {
-        width = width - 1;
+        width = (width as number) - 1;
       }
-      return width;
+      return width as number;
     },
     getRightTopCorner(): void {
       let res = {
@@ -311,8 +350,8 @@ const Table = defineComponent({
       if (this.$refs.header) {
         const { offsetHeight } = this.$refs.header as HTMLHtmlElement;
         res.height = offsetHeight;
-      } else if (this.$refs['header-center']) {
-        const { offsetHeight } = this.$refs['header-center'] as HTMLHtmlElement;
+      } else if (this.$refs["header-center"]) {
+        const { offsetHeight } = this.$refs["header-center"] as HTMLHtmlElement;
         res.height = offsetHeight;
       }
       this.rightTopCorner = res;
@@ -338,9 +377,9 @@ const Table = defineComponent({
     },
     resetDOMInfo() {
       this.getNewScrollWidth();
-      this.$nextTick(() => {
+      nextTick(() => {
         this.getRightTopCorner();
-      })
+      });
     },
     getNewScrollWidth() {
       const table = this.$refs.body as HTMLDivElement;
@@ -379,7 +418,6 @@ export default Table;
     }
   }
   &-header {
-    // box-shadow: 0 2px 6px -2px rgb(0 0 0 / 20%);
     border-bottom: 1px solid;
     border-color: inherit;
     z-index: 2;
@@ -402,6 +440,7 @@ export default Table;
     word-wrap: break-word;
     box-sizing: border-box;
     position: relative;
+    width: 100%;
     thead {
       tr {
         th {

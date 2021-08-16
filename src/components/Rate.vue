@@ -55,6 +55,7 @@ const Rate = defineComponent({
       hoverValue: 0,
     };
   },
+  emits: ["update:modelValue"],
   mounted() {
     this.hoverValue = this.modelValue;
   },

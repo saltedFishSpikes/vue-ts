@@ -15,7 +15,7 @@
       :checked="checked"
       class="origin-radio"
       :disabled="disabled"
-      @click.stop.prevent="choose"
+      @click.stop.prevent="onChoose"
       :name="name"
     />
     <span class="label">
@@ -26,6 +26,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue"; // eslint-disable-line no-unused-vars
 import { SizeTypes } from "@/common/init";
+
+type beforeChooseFun = (v: Boolean | String | Number) => boolean;
 const Radio = defineComponent({
   props: {
     checked: {
@@ -54,9 +56,14 @@ const Radio = defineComponent({
     },
     name: {
       type: [String, Number, Boolean],
-      default: ''
-    }
+      default: "",
+    },
+    beforeChoose: {
+      type: Function as PropType<beforeChooseFun>,
+      default: () => true,
+    },
   },
+  emits: ["on-choose"],
   computed: {
     selfRadioCls(): object {
       const prefix = "radio-self";
@@ -87,8 +94,10 @@ const Radio = defineComponent({
     },
   },
   methods: {
-    choose(): void {
-      this.$emit("on-choose", this.value);
+    onChoose() {
+      if (this.beforeChoose(this.value)) {
+        this.$emit("on-choose", this.value);
+      }
     },
   },
 });
@@ -116,7 +125,6 @@ export default Radio;
     border-radius: 50%;
     position: relative;
     box-sizing: border-box;
-    
     &-lg {
       width: 20px;
       height: 20px;

@@ -32,5 +32,14 @@ export enum TableCellType {
 }
 export type ClassType = Array<string> | string | object
 export interface AnyObjType {
-  [key: string]:  any
+  [key: string]: any
+}
+export interface HtmlObjType {
+  [key:string]: HTMLElement
+}
+export interface SelectOptionType extends AnyObjType {
+  key: string | number;
+  value?: string | number | boolean;
+  label: string | number | Function;
+  disabled?: boolean;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div :class="inputClass">
+  <div :class="inputClass" :style="{ width: inputWidth + 'px' }">
     <slot name="addonBefore">
       <div :class="addonCls('brr')" :style="beforeCusStyle" v-if="addonBefore">
         {{ addonBefore }}
@@ -38,7 +38,6 @@
       <input
         class="content"
         ref="input"
-        :style="{ width: inputWidth + 'px' }"
         :placeholder="placeholder"
         :value="showValue"
         :type="type"
@@ -55,7 +54,7 @@
         @click.stop="clear"
         :style="{ visibility: showClear ? 'visible' : 'hidden' }"
       ></i>
-      <slot name="suffix">
+      <slot v-if="!showClear" name="suffix">
         <span>{{ suffix }}</span>
       </slot>
     </div>
@@ -116,7 +115,7 @@ const Input = defineComponent({
       default: 5,
     },
     inputWidth: {
-      type: [Number, String],
+      validator: (v: number | string) => !isNaN(+v),
       default: 150,
     },
     modelValue: {
@@ -151,10 +150,19 @@ const Input = defineComponent({
       isFocus: false,
     };
   },
+  emits: [
+    "update:modelValue",
+    "on-input",
+    "on-focus",
+    "on-blur",
+    "on-clear",
+    "input-enter",
+  ],
   computed: {
     inputClass(): object {
       return {
         input: true,
+        "input--focus": this.isFocus,
         "no-border": !this.border,
       };
     },
@@ -164,7 +172,7 @@ const Input = defineComponent({
         "input-lg": this.size === SizeTypes.LARGE,
         "input-sm": this.size === SizeTypes.SMALL,
         "flex-v-b": this.type !== InputTypes.TEXTAREA,
-        "disabled": this.disabled
+        disabled: this.disabled,
       };
     },
     addonCls(): Function {
@@ -180,6 +188,11 @@ const Input = defineComponent({
     },
     showValue(): string | number {
       return this.isFocus ? this.inputValue : this.inputFormat(this.inputValue);
+    },
+  },
+  watch: {
+    modelValue(newV: string | number) {
+      this.inputValue = newV;
     },
   },
   methods: {
@@ -206,11 +219,12 @@ const Input = defineComponent({
       if (!this.inputValue) return;
       this.inputValue = "";
       this.$emit("update:modelValue", this.inputValue);
+      this.$emit("on-clear", this.inputValue);
     },
-    focus():void {
+    focus(): void {
       this.getInput()?.focus();
     },
-    blur():void {
+    blur(): void {
       this.getInput()?.blur();
     },
     getInput(): HTMLInputElement | HTMLTextAreaElement {
@@ -234,8 +248,14 @@ export default Input;
   font-size: @defaultFS;
   box-sizing: border-box;
   width: fit-content;
+  &.input--focus {
+    border-color: @primaryColor;
+    box-shadow: 0 0 0 2px fade(@primaryColor, 20%);
+  }
   &-main {
     padding: 4px;
+    flex-grow: 1;
+    overflow: hidden;
     .content {
       padding: 0 6px;
       outline: none;
@@ -243,6 +263,8 @@ export default Input;
       background-color: inherit;
       resize: none;
       cursor: inherit;
+      flex-flow: 1;
+      overflow: hidden;
     }
   }
   .disabled {

@@ -49,6 +49,7 @@ interface radioValue {
   disabled?: boolean;
   render?: Function;
 }
+type beforeChooseFun = (v: ValueType) => boolean;
 
 const RadioGroup = defineComponent({
   components: {
@@ -89,7 +90,14 @@ const RadioGroup = defineComponent({
       type: String as PropType<RadioTypes>,
       default: RadioTypes.DEFAULT,
     },
+
+    beforeChoose: {
+      type: Function as PropType<beforeChooseFun>,
+      default: () => true,
+    },
   },
+  emits: ["update:modelValue"],
+
   computed: {
     radioType(): Boolean {
       return this.type === RadioTypes.DEFAULT;
@@ -97,7 +105,9 @@ const RadioGroup = defineComponent({
   },
   methods: {
     choose(v: ValueType): void {
-      this.$emit("update:modelValue", v);
+      if (this.beforeChoose(v)) {
+        this.$emit("update:modelValue", v);
+      }
     },
     radioButtonStyle(checked: boolean, index: number): object {
       return {

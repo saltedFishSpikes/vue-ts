@@ -1,4 +1,9 @@
 import { ClassType, AnyObjType } from './init'
+
+export const isInObject = (obj:object, key: string) => {
+  return Object.prototype.hasOwnProperty.call(obj, key)
+}
+
 export const setObjectAttr = (obj: object, key: number | string, value: any) => {
   Object.defineProperties(obj, {
     [key]: {
@@ -55,6 +60,12 @@ export const getScrollWidth = () => {
   scrollWidth = noScrollWidth - hasScrollWidth
   return scrollWidth
 }
+/**
+ * 获取嵌套的对象数组最大深度
+ * @param arr 
+ * @param childKey 作为子数组的对象键名
+ * @returns 深度，最小1
+ */
 export const getDeep = <T extends AnyObjType>(arr: Array<T>, childKey: string = 'children'): number => {
   const res = arr.map(obj => {
     if (Object.hasOwnProperty.call(obj, childKey) && Array.isArray(obj[childKey])) {
@@ -64,6 +75,13 @@ export const getDeep = <T extends AnyObjType>(arr: Array<T>, childKey: string = 
   })
   return Math.max(...res)
 }
+/**
+ * 嵌套对象数组拉平
+ * @param arr 
+ * @param childKey 作为子数组的对象键名
+ * @param deep 拉平的深度
+ * @returns 拉平后的数组
+ */
 export const arrayFlat = <T extends AnyObjType>(arr: Array<T>, childKey: string = 'children', deep: number = Infinity): Array<T> => {
   let res: Array<T> = []
   if (deep > 1) {
@@ -79,6 +97,13 @@ export const arrayFlat = <T extends AnyObjType>(arr: Array<T>, childKey: string 
     return arr
   }
 }
+/**
+ * 获取某个深度的元素集合
+ * @param arr 
+ * @param childKey 作为子数组的对象键名
+ * @param deep 深度
+ * @returns 该深度的元素集合
+ */
 export const getItemsByDeep = <T extends AnyObjType>(arr: Array<T>, childKey: string = 'children', deep: number = Infinity): Array<T> => {
   while (deep > 1 && arr.length) {
     arr = arr.map(obj => obj[childKey]).filter(obj => !!obj).flat(Infinity)
