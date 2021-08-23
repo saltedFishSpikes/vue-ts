@@ -111,3 +111,7 @@ export const getItemsByDeep = <T extends AnyObjType>(arr: Array<T>, childKey: st
   }
   return arr
 }
+
+export const isImage = (fileName:string): boolean =>  {
+  return /\.(png|jpg|jpeg|bmp|gif)$/.test(fileName);
+}

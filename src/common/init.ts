@@ -30,6 +30,18 @@ export enum TableCellType {
   BODY = 'body',
   HEADER = 'header'
 }
+
+export enum AjaxType {
+  GET = 'get',
+  POST = 'post',
+  PUT = 'put',
+  DELETE = 'delete',
+  HEAD = 'head',
+  OPTIONS = 'options',
+  TRACE = 'trace',
+  CONNECT = 'connect'
+}
+
 export type ClassType = Array<string> | string | object
 export interface AnyObjType {
   [key: string]: any

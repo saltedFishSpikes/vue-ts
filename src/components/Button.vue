@@ -1,5 +1,5 @@
 <template>
-  <button :class="className" @click.stop="onClick">
+  <button :class="className" @click="onClick">
     <template v-if="!noContent">
       <slot name="default">
         <span>{{ circle ? "B" : "button" }}</span>

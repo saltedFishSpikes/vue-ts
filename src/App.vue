@@ -62,13 +62,13 @@
       :tableColumn="tableColumn"
       :tableData="tableData"
     ></m-table> -->
-    <m-calender
+    <!-- <m-calender
       @on-day-click="gun"
       border
       v-model:currentYear="year"
       v-model:currentMonth="month"
       v-model:currentDay="day"
-    ></m-calender>
+    ></m-calender> -->
     <!-- <m-select
       v-model:modelValue="sele"
       search
@@ -87,34 +87,51 @@
       ]"
       :beforeSelect="beforeSelect"
     ></m-select> -->
+    <!-- <div class="fds" v-LazyLoad.img="36">
+      <m-input v-for="i of val" :key="i">{{ i }}</m-input>
+    </div>
+    <div class="fds" v-LazyLoad.img="36">
+      <m-input v-for="i of val" :key="i">{{ i }}</m-input>
+    </div> -->
+    <m-upload a="89" v-model="files" @on-delete="deleteFile">
+      <!-- <template v-slot:file="{ data }">{{ data.name }}</template> -->
+    </m-upload>
   </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import Button from "./components/Button.vue";
-import Input from "./components/Input.vue";
-import Radio from "./components/Radio.vue";
-import RadioGroup from "./components/RadioGroup.vue";
-import Rate from "./components/Rate.vue";
-import Table from "./components/Table.vue";
-import Calender from "./components/Calender.vue";
-import Select from "./components/Select.vue";
+// import { Options, Vue } from "vue-class-component";
+import { defineComponent } from "vue";
+// import Button from "./components/Button.vue";
+// import Input from "./components/Input.vue";
+// import Radio from "./components/Radio.vue";
+// import RadioGroup from "./components/RadioGroup.vue";
+// import Rate from "./components/Rate.vue";
+// import Table from "./components/Table.vue";
+// import Calender from "./components/Calender.vue";
+// import Select from "./components/Select.vue";
+import Upload from "./components/Upload.vue";
 import { getScrollWidth } from "@/common/util";
-@Options({
+import LazyLoad from "./directive/lazy-load";
+const App = defineComponent({
   components: {
-    "m-button": Button,
-    "m-input": Input,
-    "m-radio": Radio,
-    "m-radio-group": RadioGroup,
-    "m-rate": Rate,
-    "m-table": Table,
-    "m-calender": Calender,
-    "m-select": Select,
+    // "m-button": Button,
+    // "m-input": Input,
+    // "m-radio": Radio,
+    // "m-radio-group": RadioGroup,
+    // "m-rate": Rate,
+    // "m-table": Table,
+    // "m-calender": Calender,
+    // "m-select": Select,
+    "m-upload": Upload,
+  },
+  directives: {
+    LazyLoad,
   },
   data() {
     return {
-      val: 90,
+      files: [],
+      val: 10000,
       ds: false,
       data: [
         { id: 1, value: 1, label: "s", disabled: true },
@@ -257,6 +274,12 @@ import { getScrollWidth } from "@/common/util";
     // }, 2000);
   },
   methods: {
+    deleteFile(file: File) {
+      this.files = this.files.filter((i) => {
+        // console.log(i, file, i === file);
+        return i !== file;
+      });
+    },
     beforeSelect() {
       return true;
     },
@@ -278,13 +301,19 @@ import { getScrollWidth } from "@/common/util";
       console.log(arguments);
     },
   },
-})
-export default class App extends Vue {}
+});
+export default App;
 </script>
 
 <style lang="less">
 .asd {
   margin: 10px;
+  height: 100vh;
+  overflow: auto;
+  .fds {
+    height: 50%;
+    overflow: auto;
+  }
   // background-color: red
   .sle {
     color: red;
