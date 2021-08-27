@@ -93,16 +93,18 @@
     <div class="fds" v-LazyLoad.img="36">
       <m-input v-for="i of val" :key="i">{{ i }}</m-input>
     </div> -->
-    <m-upload a="89" v-model="files" @on-delete="deleteFile">
-      <!-- <template v-slot:file="{ data }">{{ data.name }}</template> -->
-    </m-upload>
+    <!-- <m-upload a="89" v-model="files" @on-delete="deleteFile">
+      <template v-slot:file="{ data }">{{ data.name }}</template>
+    </m-upload> -->
+    <m-button type="primary" @on-click="showToast">showToast</m-button>
+    <m-button type="primary" @on-click="close">close</m-button>
   </div>
 </template>
 
 <script lang="ts">
 // import { Options, Vue } from "vue-class-component";
 import { defineComponent } from "vue";
-// import Button from "./components/Button.vue";
+import Button from "./components/Button.vue";
 // import Input from "./components/Input.vue";
 // import Radio from "./components/Radio.vue";
 // import RadioGroup from "./components/RadioGroup.vue";
@@ -110,12 +112,12 @@ import { defineComponent } from "vue";
 // import Table from "./components/Table.vue";
 // import Calender from "./components/Calender.vue";
 // import Select from "./components/Select.vue";
-import Upload from "./components/Upload.vue";
+// import Upload from "./components/Upload.vue";
 import { getScrollWidth } from "@/common/util";
 import LazyLoad from "./directive/lazy-load";
 const App = defineComponent({
   components: {
-    // "m-button": Button,
+    "m-button": Button,
     // "m-input": Input,
     // "m-radio": Radio,
     // "m-radio-group": RadioGroup,
@@ -123,7 +125,7 @@ const App = defineComponent({
     // "m-table": Table,
     // "m-calender": Calender,
     // "m-select": Select,
-    "m-upload": Upload,
+    // "m-upload": Upload,
   },
   directives: {
     LazyLoad,
@@ -268,12 +270,45 @@ const App = defineComponent({
     getScrollWidth();
   },
   mounted() {
+    // this.$toast.show({
+    //   content:
+    //     "fdhsjkskdhjgshj是更好的DHL法国进口公司电话过来就快乐和法定机构设计开发刚回到家",
+    //   time: 0,
+    // });
+    // this.$toast.show({ content: "fdhshj" });
+    // setTimeout(() => {
+    //   console.log("要删了");
+    //   this.$toast.close(p);
+    //   let s = this.$toast.show({ content: "hhhhhh" });
+    //   console.log(s);
+    // }, 4000);
+    // this.$toast.close();
     // this.$refs["m-input"].focus();
     // setTimeout(() => {
     //   this.$refs["m-input"].blur();
     // }, 2000);
   },
   methods: {
+    close() {
+      this.$toast.closeAll();
+    },
+    showToast() {
+      // this.$toast.warn("nnn");
+      this.$toast.show({
+        content:
+          "该死的鬼地方分公司的国际化工际设计根据了类似  了零九十六稍等 给",
+        closeable: true,
+        offset: 20,
+        render: (h: Function) => h("div", "fdj"),
+      });
+      // this.$toast.warn({
+      //   content:
+      //     "该死的鬼地方分公搭建公路建设国际设计根据了类似  了零九十六稍等 给",
+      //   time: 1000,
+      //   offset: 10,
+      // });
+      // const c = this.$toast.show({ content: "哈哈哈哈哈" });
+    },
     deleteFile(file: File) {
       this.files = this.files.filter((i) => {
         // console.log(i, file, i === file);

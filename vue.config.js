@@ -1,5 +1,6 @@
 const path = require('path');
 const openInEditor = require('launch-editor-middleware')
+
 function resolve(dir) {
   return path.join(__dirname, dir);
 }
