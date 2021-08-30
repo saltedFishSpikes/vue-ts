@@ -98,13 +98,15 @@
     </m-upload> -->
     <m-button type="primary" @on-click="showToast">showToast</m-button>
     <m-button type="primary" @on-click="close">close</m-button>
+    <m-rate v-model="kl" half>皮</m-rate>
   </div>
 </template>
 
 <script lang="ts">
 // import { Options, Vue } from "vue-class-component";
 import { defineComponent } from "vue";
-import Button from "./components/Button.vue";
+import { Button } from "@/components";
+// import Button from "./components/Button.vue";
 // import Input from "./components/Input.vue";
 // import Radio from "./components/Radio.vue";
 // import RadioGroup from "./components/RadioGroup.vue";
@@ -113,8 +115,8 @@ import Button from "./components/Button.vue";
 // import Calender from "./components/Calender.vue";
 // import Select from "./components/Select.vue";
 // import Upload from "./components/Upload.vue";
-import { getScrollWidth } from "@/common/util";
-import LazyLoad from "./directive/lazy-load";
+// import { getScrollWidth } from "@/common/util";
+// import LazyLoad from "./directive/lazy-load";
 const App = defineComponent({
   components: {
     "m-button": Button,
@@ -127,9 +129,9 @@ const App = defineComponent({
     // "m-select": Select,
     // "m-upload": Upload,
   },
-  directives: {
-    LazyLoad,
-  },
+  // directives: {
+  //   LazyLoad,
+  // },
   data() {
     return {
       files: [],
@@ -266,9 +268,9 @@ const App = defineComponent({
       console.log(v);
     },
   },
-  created() {
-    getScrollWidth();
-  },
+  // created() {
+  //   getScrollWidth();
+  // },
   mounted() {
     // this.$toast.show({
     //   content:

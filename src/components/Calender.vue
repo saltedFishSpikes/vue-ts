@@ -35,7 +35,7 @@ import { SelectOptionType } from "@/common/init"; // eslint-disable-line no-unus
 import { defineComponent } from "vue";
 import Table from "./Table.vue";
 import Select from "./Select.vue";
-import Divider from "./Divide.vue";
+import Divider from "./Divider.vue";
 
 type CurrDay = {
   isEmpty: boolean;
