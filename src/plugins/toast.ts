@@ -1,12 +1,16 @@
 import { createVNode, render, App, VNode, nextTick } from "vue";
-import Toast from "@/components/Toast.vue";
-import { ToastFunType, ToastOptions, ToastType } from "@/common/init";
+import { Toast } from "@/components";
+import {
+  ToastFunType,
+  ToastOptions,
+  ToastOrDialogType as ToastType
+} from "@/common/init";
 import { setObjectAttr } from "@/common/util";
 
 const ToastPlugin = {
   count: 0,
   map: new Map() as Map<number, VNode>,
-  queue: [] as Array<Object>,
+  queue: [] as Array<ToastOptions>,
   isCreating: false,
   adjustOffset(defaultOffSet: number = 20, deleteId?: number) {
     let topCount = 0;
@@ -24,17 +28,17 @@ const ToastPlugin = {
       }
     }
   },
-  create(obj: any = {}, n?: number) {
+  create(obj: ToastOptions, n?: number) {
     if (this.isCreating) return;
     this.isCreating = true;
-    const toast = document.createElement("div");
+    let toast: HTMLDivElement | null = document.createElement("div");
     if (n === undefined) n = this.count++;
+    toast.id = `toast_${n}`;
     // 销毁
     const onDestory = () => {
-      render(null, toast);
-      toast.firstElementChild &&
-        document.body.removeChild(toast.firstElementChild as Element);
+      render(null, toast as HTMLDivElement);
       this.map.delete(n as number);
+      toast = null;
       obj.onDestory?.();
     };
 
@@ -42,7 +46,8 @@ const ToastPlugin = {
     const vm = createVNode(Toast, {
       ...obj,
       id: `toast_${n}`,
-      onDestory,
+      key: `toast_${n}`,
+      onOnDestory: onDestory,
       adjustOffset: this.adjustOffset.bind(this, obj.offset, n)
     });
     this.map.set(n, vm);
@@ -57,7 +62,7 @@ const ToastPlugin = {
     nextTick(() => {
       this.isCreating = false;
       if (this.queue.length) {
-        this.create(this.queue.shift());
+        this.create(this.queue.shift() as ToastOptions);
       }
     });
 
@@ -67,7 +72,7 @@ const ToastPlugin = {
     const that = this;
 
     const $toast: ToastFunType = {
-      show(opt: ToastOptions | string | number | boolean, type?: ToastType) {
+      show(opt: ToastOptions | string | number, type?: ToastType) {
         // 使用队列结构的原因
         // 连续多次生成toast，在第一个还未渲染完成获取不到元素高度的时候，第二个可能已经开始计算offset，导致计算出的offset没有加上前几个同时生成的toast的高度
         // 连续调用可能使生成的toast序号错误
@@ -86,22 +91,22 @@ const ToastPlugin = {
         that.queue.push(opt);
         if (!that.isCreating) {
           const n = that.count++;
-          that.create(that.queue.shift(), n);
+          that.create(that.queue.shift() as ToastOptions, n);
           return n;
         }
         // 若当前toast没有在生成（被占用），返回的是当前正在生成的序号加上这个toast在队列中的下标
         return that.count + that.queue.findIndex(o => o === opt);
       },
-      success(opt: ToastOptions | string | number | boolean) {
+      success(opt: ToastOptions | string | number) {
         this.show(opt, ToastType.SUCCESS);
       },
-      fail(opt: ToastOptions | string | number | boolean) {
+      fail(opt: ToastOptions | string | number) {
         this.show(opt, ToastType.FAIL);
       },
-      info(opt: ToastOptions | string | number | boolean) {
+      info(opt: ToastOptions | string | number) {
         this.show(opt, ToastType.INFO);
       },
-      warn(opt: ToastOptions | string | number | boolean) {
+      warn(opt: ToastOptions | string | number) {
         this.show(opt, ToastType.WARN);
       },
       close(id: number) {
@@ -109,7 +114,7 @@ const ToastPlugin = {
       },
       closeAll() {
         for (let id of that.map.keys()) {
-          this.close(id);
+          this.close?.(id);
         }
       }
     };

@@ -1,6 +1,10 @@
 <template>
   <transition name="toast">
-    <div class="toast" v-show="show" :style="{ top: `${currOffset}px` }">
+    <div
+      class="toast"
+      v-show="show"
+      :style="{ top: `${currOffset}px`, zIndex }"
+    >
       <i v-if="iconStyle" class="iconfont fs-16 mr5" :class="iconStyle"></i>
       <div class="fs-14 content">
         <m-render v-if="render" :renderFun="render"></m-render>
@@ -25,7 +29,7 @@ import {
   toRefs,
   VNode, // eslint-disable-line no-unused-vars
 } from "vue";
-import { ToastType } from "@/common/init";
+import { ToastOrDialogType as ToastType } from "@/common/init";
 import Render from "./Render.vue";
 
 const getIconClass = (type: ToastType) => {
@@ -64,6 +68,10 @@ const Toast = defineComponent({
       type: Number,
       default: 20,
     },
+    zIndex: {
+      type: Number,
+      default: 999,
+    },
     render: {
       type: Function as PropType<(h: Function) => VNode>,
       default: null,
@@ -72,16 +80,13 @@ const Toast = defineComponent({
       type: Function,
       default: () => {},
     },
-    onDestory: {
-      type: Function,
-      default: () => {},
-    },
   },
   components: {
     "m-render": Render,
   },
-  setup(prop) {
-    const { type, time, onDestory, offset, adjustOffset } = toRefs(prop);
+  emits: ["on-destory"],
+  setup(prop, { emit }) {
+    const { type, time, offset, adjustOffset } = toRefs(prop);
     const iconStyle = getIconClass(type.value);
     const show = ref(false);
     const currOffset = ref(offset.value);
@@ -93,7 +98,7 @@ const Toast = defineComponent({
       nextTick(() => (show.value = false));
       // 为了显示过渡动画，所以不是在关闭后立即删除dom
       // 且暴露出去让全局close方法能调用这个
-      setTimeout(() => onDestory.value(), 200);
+      setTimeout(() => emit("on-destory"), 200);
     };
     const setOffset = (v: number) => (currOffset.value = v);
     onMounted(() => {

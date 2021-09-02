@@ -10,3 +10,5 @@ export { default as Select } from "./Select.vue";
 export { default as Table } from "./Table.vue";
 export { default as Toast } from "./Toast.vue";
 export { default as Upload } from "./Upload.vue";
+export { default as Mask } from "./Mask.vue";
+export { default as Dialog } from "./Dialog.vue";

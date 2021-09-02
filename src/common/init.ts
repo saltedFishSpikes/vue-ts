@@ -1,3 +1,5 @@
+import { VNode } from "vue";
+
 export enum ButtonTypes {
   DEFAULT = "default",
   PRIMARY = "primary",
@@ -42,7 +44,7 @@ export enum AjaxType {
   CONNECT = "connect"
 }
 
-export enum ToastType {
+export enum ToastOrDialogType {
   INFO = "info",
   SUCCESS = "success",
   FAIL = "fail",
@@ -62,25 +64,45 @@ export interface SelectOptionType extends AnyObjType {
   label: string | number | Function;
   disabled?: boolean;
 }
-export interface ToastFunType {
-  show: (
-    obj: ToastOptions | string | number | boolean,
-    type?: ToastType
-  ) => void;
-  success: (obj: ToastOptions | string | number | boolean) => void;
-  info: (obj: ToastOptions | string | number | boolean) => void;
-  fail: (obj: ToastOptions | string | number | boolean) => void;
-  warn: (obj: ToastOptions | string | number | boolean) => void;
-  close: (id: number) => void;
-  closeAll: () => void;
+export interface FunType<T> {
+  show: (obj: T, type?: ToastOrDialogType) => void;
+  success: (obj: T) => void;
+  info: (obj: T) => void;
+  fail: (obj: T) => void;
+  warn: (obj: T) => void;
+  close?: (id: number) => void;
+  closeAll?: () => void;
 }
-
 export interface ToastOptions {
   time?: number;
   offset?: number;
   maxWidth?: string;
   content?: string;
-  type?: ToastType;
+  type?: ToastOrDialogType;
   closeable?: boolean;
   render?: Function;
+  onDestory?: Function;
+  zIndex?: number;
 }
+
+export interface DialogOptions {
+  offset?: number;
+  width?: string;
+  content?: string;
+  type?: ToastOrDialogType;
+  title?: string;
+  contentRender?: () => VNode;
+  footerRender?: () => VNode;
+  titleRender?: () => VNode;
+  showMask?: boolean;
+  showClose?: boolean;
+  maskClose?: boolean;
+  beforeClose?: Function;
+  onOk?: Function;
+  okText?: string;
+  onCancel?: Function;
+  cancelText?: string;
+}
+
+export type DialogFunType = FunType<DialogOptions | string | number>;
+export type ToastFunType = FunType<ToastOptions | string | number>;

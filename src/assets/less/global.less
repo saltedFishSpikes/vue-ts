@@ -14,18 +14,21 @@
 .c(light-grey, @lightGreyColor);
 .c(transparent, transparent);
 
-.fs(12);
-.fs(14);
-.fs(16);
+.fs(30);
+
+.fw(b, bold);
 
 .createFs(20);
 
 .padding(6, 15, 6, 15);
 .padding(4, 15, 4, 15);
 .padding(0, 7, 0, 7);
+.padding(4, 0, 4, 0);
 .padding-one(5);
 
 .margin-one(5);
+.margin-one(10);
+.margin-one(40);
 
 .falign(center);
 .falign(left);
@@ -70,4 +73,26 @@
 .flex-v-b {
   display: flex;
   align-items: baseline;
+}
+
+.break-y {
+  word-break: break-word;
+}
+.break-n {
+  word-break: keep-all;
+}
+
+.flex-v-c {
+  display: flex;
+  align-items: center;
+}
+
+.pos-r {
+  position: relative;
+}
+.pos-a {
+  position: absolute;
+}
+.pos-f {
+  position: fixed;
 }
